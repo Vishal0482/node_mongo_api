@@ -1,5 +1,11 @@
 const mongoose = require('mongoose');
 
+const address = mongoose.Schema(
+    {
+        name: String,
+    }
+)
+
 const userModel = mongoose.Schema(
     {
         email: {
@@ -11,21 +17,56 @@ const userModel = mongoose.Schema(
             type: String,
             require: true,
         },
+        type: {
+            type: String,
+            require: true,
+        },
         name: {
             type: String,
+            default: null
         },
-        address: {
-            type: String,
+        mobile: {
+            type: Number,
+            min: 9,
+            max: 11,
+            default: null
         },
+        address: [
+            {
+                address_line: {
+                    type: String,
+                },
+                city: {
+                    type: String,
+                },
+                state: {
+                    type: String,
+                },
+                country: {
+                    type: String,
+                },
+                pincode: {
+                    type: Number,
+                    min: 5,
+                    max: 7,
+                }
+            }
+        ],
         pic: {
             type: String,
+            default: null
+        },
+        createdBy: {
+            type: mongoose.Types.ObjectId,
+            default: null
+        },
+        updatedBy: {
+            type: mongoose.Types.ObjectId,
+            default: null
         }
     },
     {
-        timestamp: {
-            createdAt: "created_at",
-            updatedAt: "updated_at",
-        },
+        timestamps: true,
     }
 )
 
