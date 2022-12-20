@@ -1,11 +1,5 @@
 const mongoose = require('mongoose');
 
-const address = mongoose.Schema(
-    {
-        name: String,
-    }
-)
-
 const userModel = mongoose.Schema(
     {
         email: {

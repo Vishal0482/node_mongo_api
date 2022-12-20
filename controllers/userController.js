@@ -80,3 +80,12 @@ exports.setProfileImage = (req, res) => {
         return badrequest({ message: "Something Went Wrong." }, res);
     }
 }
+
+exports.getUserList = async (req, res) => {
+    try {
+        const data = await User.find();
+        return onSuccess("User List Fetched Successfully.", data, res);
+    } catch (error) {
+        return badrequest({ message: "Something Went Wrong." }, res);
+    }
+}
