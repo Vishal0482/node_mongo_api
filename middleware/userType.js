@@ -1,5 +1,5 @@
 const User = require("../models/userModel");
-const { USER_TYPES } = require("../shared.js/constants");
+const { USER_TYPES } = require("../shared/constants");
 const { badrequest } = require("../utilities/responseManager");
 
 exports.userType = async(req, res, next) => {

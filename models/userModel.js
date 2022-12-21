@@ -49,14 +49,6 @@ const userModel = mongoose.Schema(
         pic: {
             type: String,
             default: null
-        },
-        createdBy: {
-            type: mongoose.Types.ObjectId,
-            default: null
-        },
-        updatedBy: {
-            type: mongoose.Types.ObjectId,
-            default: null
         }
     },
     {
