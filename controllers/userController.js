@@ -1,10 +1,8 @@
 const User = require("../models/userModel");
-const user = require("../routes/userRoute");
-const { EMAIL_REGEX, USER_TYPES, IMAGE_TYPES } = require("../shared/constants");
+const { EMAIL_REGEX, USER_TYPES } = require("../shared/constants");
 const { encryptPassword, decryptPassword } = require("../utilities/crypto");
 const { generateJWT } = require("../utilities/helper");
 const { onSuccess, onError, badrequest } = require("../utilities/responseManager");
-const { uploadImageToFirebase } = require("../utilities/uploadImage");
 
 exports.login = async (req, res) => {
     const { email, password } = req.body;
@@ -36,7 +34,7 @@ exports.register = async (req, res) => {
             try {
                 const cryptPassword = await encryptPassword(password);
                 const user = await User.create({ email, password: cryptPassword, type });
-                return onSuccess("Registration Successfull.", {_id: user._id}, res);
+                return onSuccess("Registration Successfull.", { _id: user._id }, res);
 
             } catch (error) {
                 console.log("Registration Error >> ");
@@ -76,27 +74,12 @@ exports.setProfile = async (req, res) => {
 
 exports.setProfileImage = async (req, res) => {
     try {
-        const size = 1; // size in MB
-        const file = req.file;
-        if(file) {
-            if(IMAGE_TYPES.includes(file.mimetype)) {
-                if(file.size < size * 1024 * 1024) {
-                    const imageUrl = await uploadImageToFirebase(req.token.id, file);
-                    if(imageUrl !== 0) {
-                        await User.findByIdAndUpdate(req.token.id, { pic: imageUrl });
-                        const updatedData = await User.findById(req.token.id);
-                        return onSuccess("Image uploaded Successfull.", updatedData , res);
-                    } else {
-                        return badrequest({ message: "Error Occured While Uploading."}, res);
-                    }
-                } else {
-                    return badrequest({ message: "File size is greater than "+size }, res);
-                }
-            } else {
-                return badrequest({ message: "Invalid File Formate." }, res);
-            }
+        if (req.imageUrl !== null) {
+            await User.findByIdAndUpdate(req.token.id, { pic: req.imageUrl });
+            const updatedData = await User.findById(req.token.id);
+            return onSuccess("Image uploaded Successfull.", updatedData, res);
         } else {
-            return badrequest({ message: "No File Found." }, res);
+            return badrequest({ message: "Image URL Not Found." }, res);
         }
     } catch (error) {
         return badrequest({ message: "Something Went Wrong." }, res);

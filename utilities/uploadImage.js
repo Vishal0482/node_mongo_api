@@ -1,23 +1,39 @@
-const { async } = require("@firebase/util");
-const { ref, uploadBytes, getDownloadURL, StringFormat, uploadBytesResumable } = require("firebase/storage");
+const { IMAGE_TYPES } = require("../shared/constants");
+const { ref, uploadBytes, getDownloadURL, uploadBytesResumable } = require("firebase/storage");
 const storage = require("../configuration/firebase.config");
+const { badrequest } = require("./responseManager");
 
 // file will be stored in folder named as user id.
-exports.uploadImageToFirebase = async (userId, file) => {
-    try {
-        const refrence = ref(storage, userId + '/profile-pic/' + file.originalname);
-        const metaData = { contentType: file.mimetype, name: file.originalname };
-        const data = await uploadBytes(refrence, file.buffer, metaData);
-        let imageUrl;
-        if (data) {
-            await getDownloadURL(data.ref).then((downloadURL) => {
-                imageUrl = downloadURL;
-            });
-            return imageUrl;
+exports.uploadImageToFirebase = async (req, res, next) => {
+    const size = 1; // size in MB
+    const file = req.file;
+    if (file) {
+        if (IMAGE_TYPES.includes(file.mimetype)) {
+            if (file.size < size * 1024 * 1024) {
+                try {
+                    const refrence = ref(storage, req.token.id + '/profile-pic/' + file.originalname);
+                    const metaData = { contentType: file.mimetype, name: file.originalname };
+                    const data = await uploadBytes(refrence, file.buffer, metaData);
+                    let imageUrl;
+                    if (data) {
+                        await getDownloadURL(data.ref).then((downloadURL) => {
+                            imageUrl = downloadURL;
+                        });
+                        req.imageUrl = imageUrl;
+                        next();
+                    }
+                } catch (error) {
+                    console.log(error);
+                    return badrequest({ message: "Error Occured While Uploading." }, res);
+                }
+            } else {
+                return badrequest({ message: "File size is greater than " + size }, res);
+            }
+        } else {
+            return badrequest({ message: "Invalid File Formate." }, res);
         }
-    } catch (error) {
-        console.log(error);
-        return 0;
+    } else {
+        return badrequest({ message: "File Not Found." }, res);
     }
 }
 
