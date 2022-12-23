@@ -88,21 +88,27 @@ exports.setProfileImage = async (req, res) => {
 
 exports.getUserList = async (req, res) => {
     try {
-        const { page, limit, search } = req.body;
-        await User.paginate({
-            $or: [
-                { email : { '$regex' : new RegExp(search?.email, "i")}},
-                { mobile : { '$regex' : new RegExp(search?.mobile, "i")}},
-                { name : { '$regex' : new RegExp(search?.name, "i")}},
-                { type : { '$regex' : new RegExp(search?.type, "i")}},
-                { city : { '$regex' : new RegExp(search?.city, "i")}},
-                { state : { '$regex' : new RegExp(search?.state, "i")}},
-                { country : { '$regex' : new RegExp(search?.country, "i")}},
-            ]
-        }, {page, limit, select: '-password'}).then(data => {
-            return onSuccess("User List Fetched Successfully.", data, res);
+        const { page, limit, search, select } = req.body;
+        const filterArray = [{ email: { '$regex': new RegExp("", "i") } }];
+        for (const key in search) {
+            filterArray.push({ [key]: { '$regex': new RegExp(search[key], "i") } });
+            console.log(key);
+        }
+       
+        const removePassword = select?.filter(ele => {
+            if(ele.toLowerCase() !== "password" ) {
+                return ele;
+            }
         })
+        const selectString = removePassword?.join(" ");
+
+        await User.paginate({
+            $or: filterArray
+        }, { page, limit, select: selectString || '-password' }).then(data => {
+            return onSuccess("User List Fetched Successfully.", data, res);
+        });
     } catch (error) {
+        console.log(error)
         return badrequest({ message: "Something Went Wrong." }, res);
     }
 }
