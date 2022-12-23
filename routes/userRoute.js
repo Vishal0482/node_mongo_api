@@ -13,6 +13,6 @@ user.get('/profile', authenticate, getProfile);
 user.post('/profile', authenticate, setProfile);
 user.post('/profileImage', authenticate, multerUpload.single('file'), uploadImageToFirebase, setProfileImage);
 
-user.get('/list', authenticate, userType, getUserList);
+user.post('/list', authenticate, userType, getUserList);
 
 module.exports = user;

@@ -88,8 +88,20 @@ exports.setProfileImage = async (req, res) => {
 
 exports.getUserList = async (req, res) => {
     try {
-        const data = await User.find();
-        return onSuccess("User List Fetched Successfully.", data, res);
+        const { page, limit, search } = req.body;
+        await User.paginate({
+            $or: [
+                { email : { '$regex' : new RegExp(search?.email, "i")}},
+                { mobile : { '$regex' : new RegExp(search?.mobile, "i")}},
+                { name : { '$regex' : new RegExp(search?.name, "i")}},
+                { type : { '$regex' : new RegExp(search?.type, "i")}},
+                { city : { '$regex' : new RegExp(search?.city, "i")}},
+                { state : { '$regex' : new RegExp(search?.state, "i")}},
+                { country : { '$regex' : new RegExp(search?.country, "i")}},
+            ]
+        }, {page, limit, select: '-password'}).then(data => {
+            return onSuccess("User List Fetched Successfully.", data, res);
+        })
     } catch (error) {
         return badrequest({ message: "Something Went Wrong." }, res);
     }
