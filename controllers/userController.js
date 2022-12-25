@@ -88,25 +88,41 @@ exports.setProfileImage = async (req, res) => {
 
 exports.getUserList = async (req, res) => {
     try {
-        const { page, limit, search, select } = req.body;
-        const filterArray = [{ email: { '$regex': new RegExp("", "i") } }];
+        const { page, limit, sort, search, select } = req.body;
+        const filterArray = [];
         for (const key in search) {
             filterArray.push({ [key]: { '$regex': new RegExp(search[key], "i") } });
-            console.log(key);
         }
-       
+
         const removePassword = select?.filter(ele => {
-            if(ele.toLowerCase() !== "password" ) {
+            if (ele.toLowerCase() !== "password") {
                 return ele;
             }
         })
         const selectString = removePassword?.join(" ");
+        const filterCondition = filterArray.length > 0 ? { $or: filterArray } : {};
 
-        await User.paginate({
-            $or: filterArray
-        }, { page, limit, select: selectString || '-password' }).then(data => {
-            return onSuccess("User List Fetched Successfully.", data, res);
+        const sortObject = {};
+        Object.entries(sort || {}).map((value) => {
+            if (value[0] === 'password') return null;
+            sortObject[value[0]] = (value[1] === "asc" ? 1 : -1);
         });
+
+        // console.log("Filter >> ",filterCondition);
+        // console.log("Sort >> ",sortObject);
+        // console.log("Selected >> ",selectString);
+
+        // ?? - nullise opreator assign second value if first is null or undefiend.
+        await User.paginate(
+            filterCondition,
+            {
+                page,
+                limit: limit ?? 10,
+                sort: sortObject,
+                select: selectString || '-password'
+            }).then(data => {
+                return onSuccess("User List Fetched Successfully.", data, res);
+            });
     } catch (error) {
         console.log(error)
         return badrequest({ message: "Something Went Wrong." }, res);
