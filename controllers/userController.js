@@ -1,4 +1,4 @@
-const User = require("../models/userModel");
+const { User, userValidateSchema } = require("../models/userModel");
 const { EMAIL_REGEX, USER_TYPES } = require("../shared/constants");
 const { encryptPassword, decryptPassword } = require("../utilities/crypto");
 const { generateJWT } = require("../utilities/helper");
@@ -59,6 +59,13 @@ exports.getProfile = async (req, res) => {
 }
 
 exports.setProfile = async (req, res) => {
+    try {
+        const value = await userValidateSchema.validateAsync(req.body);
+        console.log("Value >> ", value);
+    } catch (error) {
+        console.log("Error >> ",error);
+        return badrequest({ message: error.message }, res);
+    }
     try {
         await User.findByIdAndUpdate(req.token.id, req.body);
         const data = await User.findById(req.token.id).select('-password');

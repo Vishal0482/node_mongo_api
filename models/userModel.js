@@ -1,5 +1,26 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
+const Joi = require('joi');
+const { DIGIT_ONLY_REGEX, PICODE_REGEX } = require('../shared/constants');
+
+
+const addressObj = Joi.object().keys({
+    address_line: Joi.string(),
+    city: Joi.string(),
+    state: Joi.string(),
+    country: Joi.string(),
+    pincode: Joi.string().length(6).message("Pincode length must be 6 Digits long.").pattern(PICODE_REGEX).message("Invalid pincode."),
+})
+
+const userValidateSchema = Joi.object({
+    email: Joi.string().email(),
+    password: Joi.string().min(6),
+    type: Joi.string(),
+    name: Joi.string(),
+    mobile: Joi.string().length(10).message("Mobile length must be 10 Digits long.").pattern(DIGIT_ONLY_REGEX).message("Mobile must be in Digits."),
+    address: Joi.array().items(addressObj),
+    pic: Joi.string()
+});
 
 const userModel = mongoose.Schema(
     {
@@ -42,8 +63,6 @@ const userModel = mongoose.Schema(
                 },
                 pincode: {
                     type: Number,
-                    min: 5,
-                    max: 7,
                 }
             }
         ],
@@ -60,4 +79,4 @@ const userModel = mongoose.Schema(
 userModel.plugin(mongoosePaginate);
 const User = mongoose.model("User", userModel);
 // User.paginate().then({});
-module.exports = User;
+module.exports = { User, userValidateSchema };
