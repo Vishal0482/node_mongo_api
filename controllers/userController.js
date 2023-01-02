@@ -14,13 +14,13 @@ exports.login = async (req, res) => {
                 const token = generateJWT(userData._id);
                 return onSuccess("Login Successfull", { token }, res);
             } else {
-                return badrequest({ message: "Invalid Credentials.1" }, res);
+                return badrequest({ message: "Invalid Credentials." }, res);
             }
         } else {
-            return badrequest({ message: "Invalid Credentials.2" }, res);
+            return badrequest({ message: "User Not Found." }, res);
         }
     } else {
-        return badrequest({ message: "Invalid Credentials.3" }, res);
+        return badrequest({ message: "Invalid Data To Login." }, res);
     }
 }
 

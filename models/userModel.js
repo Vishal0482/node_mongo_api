@@ -78,5 +78,4 @@ const userModel = mongoose.Schema(
 
 userModel.plugin(mongoosePaginate);
 const User = mongoose.model("User", userModel);
-// User.paginate().then({});
 module.exports = { User, userValidateSchema };

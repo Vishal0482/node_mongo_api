@@ -1,4 +1,4 @@
-const User = require("../models/userModel");
+const { User } = require("../models/userModel");
 const { USER_TYPES } = require("../shared/constants");
 const { badrequest } = require("../utilities/responseManager");
 
