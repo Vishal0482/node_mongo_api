@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logger = require('../utilities/logger');
 
 const connectDB = async() => {
     try {
@@ -11,7 +12,8 @@ const connectDB = async() => {
         console.log("COLLECTION NAME: "+conn.connection.name);
         console.log("=======================================");
     } catch(error) {
-        console.log("ERROR: "+ error.message);
+        logger.logError(error);
+        // console.log("ERROR: "+ error.message);
         console.log("=======================================");
         process.exit();
     }

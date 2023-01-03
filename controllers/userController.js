@@ -54,7 +54,7 @@ exports.getProfile = async (req, res) => {
             return onSuccess("Profile Fetched Successfully.", data, res);
         }
     } catch (error) {
-
+        return onError({ message: "Error Occured while fetching profile."});
     }
 }
 
