@@ -1,7 +1,7 @@
 const { IMAGE_TYPES } = require("../shared/constants");
 const { ref, uploadBytes, getDownloadURL, uploadBytesResumable } = require("firebase/storage");
 const storage = require("../configuration/firebase.config");
-const { badrequest } = require("../utilities/responseManager");
+const { badrequest } = require("./responseManager");
 
 // file will be stored in folder named as user id.
 exports.uploadImageToFirebase = async (req, res, next) => {

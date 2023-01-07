@@ -4,7 +4,7 @@ const { authenticate } = require('../middleware/authenticate');
 const { userType } = require('../middleware/userType');
 const user = express.Router();
 const multerUpload = require('../utilities/multer');
-const { uploadImageToFirebase } = require('../services/uploadImage');
+const { uploadImageToFirebase } = require('../utilities/uploadImage');
 
 /**
   * @swagger
